@@ -32,6 +32,8 @@ button{
 }
 </style>
 </head>
+<audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
+<audio id="errorSound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-wrong-2572.mp3"></audio>
 <body>
 
 <h1>University of East Capital2</h1>
@@ -79,7 +81,14 @@ function startScan(){
 
     const result = await res.json();
     document.getElementById("status").innerHTML =
-      result.status.toUpperCase() + "<br>" + result.message;
+  result.status.toUpperCase() + "<br>" + result.message;
+
+if(result.status === "approved"){
+  document.getElementById("successSound").play();
+}
+else{
+  document.getElementById("errorSound").play();
+}
 
   });
 }
