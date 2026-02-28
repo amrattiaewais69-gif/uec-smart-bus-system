@@ -9,10 +9,22 @@
 
 <style>
 
+:root{
+  --gold:#d4af37;
+  --dark:#081424;
+  --dark2:#0a1a2f;
+  --success:#00ff88;
+  --danger:#ff4444;
+}
+
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   font-family:'Segoe UI',sans-serif;
-  background:linear-gradient(180deg,#081424,#0a1a2f);
+  background:linear-gradient(180deg,var(--dark),var(--dark2));
   color:white;
   text-align:center;
   overflow-x:hidden;
@@ -22,73 +34,88 @@ body{
 
 header{
   padding:20px;
-  font-size:30px;
+  font-size:clamp(20px,4vw,32px);
   font-weight:bold;
-  color:#d4af37;
-  border-bottom:2px solid #d4af37;
+  color:var(--gold);
+  border-bottom:2px solid var(--gold);
   letter-spacing:1px;
 }
 
-/* Moving Road Section */
+/* Road Section */
 
 .road-container{
   position:relative;
-  height:120px;
+  height:140px;
   margin-top:10px;
   overflow:hidden;
 }
 
 .road{
   position:absolute;
-  bottom:20px;
+  bottom:25px;
   width:200%;
   height:6px;
   background:repeating-linear-gradient(
     90deg,
-    #d4af37 0px,
-    #d4af37 40px,
-    transparent 40px,
-    transparent 80px
+    var(--gold) 0px,
+    var(--gold) 50px,
+    transparent 50px,
+    transparent 100px
   );
-  animation: roadMove 2s linear infinite;
+  animation:roadMove 2s linear infinite;
 }
 
 @keyframes roadMove{
   from{ transform:translateX(0); }
-  to{ transform:translateX(-80px); }
+  to{ transform:translateX(-100px); }
 }
 
 .bus{
   position:absolute;
   bottom:35px;
   left:-120px;
-  font-size:60px;
-  animation: busDrive 6s linear infinite;
+  font-size:clamp(40px,6vw,65px);
+  animation:busDrive 8s linear infinite;
 }
 
 @keyframes busDrive{
-  0%{ left:-120px; }
+  0%{ left:-150px; }
   100%{ left:110%; }
+}
+
+/* Card Style */
+
+.card{
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(212,175,55,0.3);
+  border-radius:15px;
+  padding:20px;
+  width:90%;
+  max-width:420px;
+  margin:20px auto;
+  box-shadow:0 0 25px rgba(212,175,55,0.2);
 }
 
 /* Scanner */
 
 #reader{
-  width:320px;
+  width:100%;
+  max-width:380px;
   margin:20px auto;
-  border:3px solid #d4af37;
+  border:3px solid var(--gold);
   border-radius:15px;
   padding:10px;
-  box-shadow:0 0 20px rgba(212,175,55,0.5);
+  box-shadow:0 0 20px rgba(212,175,55,0.4);
   transition:0.4s;
 }
 
 #reader.approved-glow{
-  box-shadow:0 0 35px #00ff88;
+  box-shadow:0 0 35px var(--success);
 }
 
 #reader.error-glow{
-  box-shadow:0 0 35px #ff4444;
+  box-shadow:0 0 35px var(--danger);
 }
 
 /* Overlay */
@@ -103,34 +130,81 @@ header{
   align-items:center;
   justify-content:center;
   flex-direction:column;
-  font-size:42px;
+  font-size:clamp(26px,5vw,44px);
   font-weight:bold;
   opacity:0;
   pointer-events:none;
   transition:0.4s;
   z-index:9999;
   text-align:center;
+  padding:20px;
 }
 
 #resultOverlay.show{ opacity:1; }
 
 #resultOverlay.approved{
-  background:radial-gradient(circle,#0f5132,#081424);
+  background:radial-gradient(circle,#0f5132,var(--dark));
 }
 
 #resultOverlay.rejected{
-  background:radial-gradient(circle,#5a0f0f,#081424);
+  background:radial-gradient(circle,#5a0f0f,var(--dark));
 }
 
-/* Gold Particle Burst */
+/* Inputs */
+
+input{
+  padding:14px;
+  margin:10px 0;
+  border-radius:10px;
+  border:none;
+  width:100%;
+  font-size:16px;
+}
+
+button{
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:var(--gold);
+  color:var(--dark2);
+  font-weight:bold;
+  cursor:pointer;
+  width:100%;
+  font-size:16px;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+/* Counter */
+
+.counter{
+  color:var(--gold);
+  margin-top:10px;
+  font-size:18px;
+}
+
+/* Footer */
+
+footer{
+  margin-top:40px;
+  padding:15px;
+  font-size:clamp(12px,2vw,14px);
+  border-top:2px solid var(--gold);
+  color:#ccc;
+}
+
+/* Gold Explosion */
 
 .particle{
   position:absolute;
   width:8px;
   height:8px;
-  background:#d4af37;
+  background:var(--gold);
   border-radius:50%;
-  animation: explode 1s forwards;
+  animation:explode 1s forwards;
 }
 
 @keyframes explode{
@@ -140,37 +214,18 @@ header{
   }
 }
 
-/* Inputs */
+/* Mobile Tweaks */
 
-input{
-  padding:10px;
-  margin:10px;
-  border-radius:8px;
-  border:none;
-  width:220px;
-}
+@media(max-width:600px){
 
-button{
-  padding:12px 25px;
-  border:none;
-  border-radius:8px;
-  background:#d4af37;
-  color:#0a1a2f;
-  font-weight:bold;
-  cursor:pointer;
-}
+  .road-container{
+    height:110px;
+  }
 
-.counter{
-  color:#d4af37;
-  margin-top:10px;
-}
+  .bus{
+    animation:busDrive 10s linear infinite;
+  }
 
-footer{
-  margin-top:40px;
-  padding:15px;
-  font-size:14px;
-  border-top:2px solid #d4af37;
-  color:#ccc;
 }
 
 </style>
@@ -188,10 +243,10 @@ Executive Bus Access System
   <div class="road"></div>
 </div>
 
-<div id="loginSection">
+<div id="loginSection" class="card">
   <h3>Driver Login</h3>
-  <input type="text" id="driver" placeholder="Driver Name"><br>
-  <input type="text" id="bus" placeholder="Bus Number"><br>
+  <input type="text" id="driver" placeholder="Driver Name">
+  <input type="text" id="bus" placeholder="Bus Number">
   <button onclick="startSystem()">Start System</button>
 </div>
 
@@ -223,7 +278,10 @@ function startSystem(){
   const driver=document.getElementById("driver").value;
   const bus=document.getElementById("bus").value;
 
-  if(!driver||!bus){ alert("Enter Driver Name & Bus Number"); return; }
+  if(!driver||!bus){
+    alert("Enter Driver Name & Bus Number");
+    return;
+  }
 
   document.getElementById("loginSection").style.display="none";
   document.getElementById("scanSection").style.display="block";
@@ -232,7 +290,6 @@ function startSystem(){
     "Driver: "+driver+" | Bus: "+bus+"<br>"+new Date().toLocaleString();
 
   qr=new Html5Qrcode("reader");
-
   qr.start({facingMode:"environment"},{fps:10,qrbox:250},onScanSuccess);
 }
 
@@ -241,7 +298,6 @@ async function onScanSuccess(decodedText){
   if(isProcessing) return;
 
   let data;
-
   try{ data=JSON.parse(decodedText); }
   catch{ return; }
 
@@ -278,7 +334,10 @@ async function onScanSuccess(decodedText){
     playError();
   }
 
-  setTimeout(()=>{ qr.resume(); isProcessing=false; },2000);
+  setTimeout(()=>{
+    qr.resume();
+    isProcessing=false;
+  },2000);
 }
 
 /* Overlay */
@@ -286,6 +345,8 @@ async function onScanSuccess(decodedText){
 function showOverlay(type,message){
 
   const overlay=document.getElementById("resultOverlay");
+  const reader=document.getElementById("reader");
+
   overlay.className="";
   overlay.classList.add("show",type);
   overlay.innerHTML=type.toUpperCase()+"<br>"+message;
@@ -325,10 +386,12 @@ function playSuccess(){
   const g=ctx.createGain();
   o.type="sine";
   o.frequency.value=900;
-  o.connect(g); g.connect(ctx.destination);
+  o.connect(g);
+  g.connect(ctx.destination);
   g.gain.setValueAtTime(0.5,ctx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.6);
-  o.start(); o.stop(ctx.currentTime+0.6);
+  o.start();
+  o.stop(ctx.currentTime+0.6);
 }
 
 function playError(){
@@ -337,10 +400,12 @@ function playError(){
   const g=ctx.createGain();
   o.type="triangle";
   o.frequency.value=220;
-  o.connect(g); g.connect(ctx.destination);
+  o.connect(g);
+  g.connect(ctx.destination);
   g.gain.setValueAtTime(0.4,ctx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);
-  o.start(); o.stop(ctx.currentTime+0.8);
+  o.start();
+  o.stop(ctx.currentTime+0.8);
 }
 
 </script>
