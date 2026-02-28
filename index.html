@@ -28,7 +28,7 @@ header{
   padding:20px;
 }
 
-input, select{
+input{
   padding:10px;
   margin:10px;
   border-radius:8px;
@@ -61,6 +61,7 @@ button:hover{
   margin-top:20px;
   font-size:20px;
   font-weight:bold;
+  min-height:50px;
 }
 
 .counter{
@@ -82,7 +83,7 @@ footer{
 <body>
 
 <header>
-University of East Capital<br>
+University of East Capital2<br>
 Bus Attendance System
 </header>
 
@@ -90,8 +91,8 @@ Bus Attendance System
 
 <div id="loginSection">
   <h3>Driver Login</h3>
-  <input type="text" id="driver" placeholder="Driver Name" required><br>
-  <input type="text" id="bus" placeholder="Bus Number" required><br>
+  <input type="text" id="driver" placeholder="Driver Name"><br>
+  <input type="text" id="bus" placeholder="Bus Number"><br>
   <button onclick="startSystem()">Start System</button>
 </div>
 
@@ -115,8 +116,11 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbw-G-TCGtuBDT-TbOE3Lr
 
 let studentCount = 0;
 let qr;
+let isProcessing = false;
+let lastScannedId = null;
 
 function startSystem(){
+
   const driver = document.getElementById("driver").value;
   const bus = document.getElementById("bus").value;
 
@@ -127,6 +131,7 @@ function startSystem(){
 
   document.getElementById("loginSection").style.display="none";
   document.getElementById("scanSection").style.display="block";
+
   document.getElementById("sessionInfo").innerHTML =
     "Driver: "+driver+" | Bus: "+bus+"<br>"+new Date().toLocaleString();
 
@@ -141,67 +146,103 @@ function startSystem(){
 
 async function onScanSuccess(decodedText){
 
-  const driver = document.getElementById("driver").value;
-  const bus = document.getElementById("bus").value;
+  if(isProcessing) return;
 
   let data;
 
   try{
     data = JSON.parse(decodedText);
   }catch(e){
-    document.getElementById("status").innerHTML="Invalid QR Format";
-    playBeep("error");
+    playError();
     return;
   }
 
-  const response = await fetch(scriptURL,{
-    method:"POST",
-    body: JSON.stringify({
-      studentId: data.id,
-      studentName: data.name,
-      college: data.college,
-      driverName: driver,
-      busNumber: bus
-    })
-  });
-
-  const result = await response.json();
-
-  document.getElementById("status").innerHTML =
-    result.status.toUpperCase()+"<br>"+result.message;
-
-  if(result.status === "approved"){
-    studentCount++;
-    document.getElementById("count").innerText = studentCount;
-    playBeep("success");
-  }else{
-    playBeep("error");
+  if(data.id === lastScannedId){
+    return;
   }
+
+  isProcessing = true;
+  lastScannedId = data.id;
+
+  qr.pause();
+
+  const driver = document.getElementById("driver").value;
+  const bus = document.getElementById("bus").value;
+
+  try{
+
+    const response = await fetch(scriptURL,{
+      method:"POST",
+      body: JSON.stringify({
+        studentId: data.id,
+        studentName: data.name,
+        college: data.college,
+        driverName: driver,
+        busNumber: bus
+      })
+    });
+
+    const result = await response.json();
+
+    document.getElementById("status").innerHTML =
+      result.status.toUpperCase()+"<br>"+result.message;
+
+    if(result.status === "approved"){
+      studentCount++;
+      document.getElementById("count").innerText = studentCount;
+      playSuccess();
+    }else{
+      playError();
+    }
+
+  }catch(error){
+    document.getElementById("status").innerHTML="Connection Error";
+    playError();
+  }
+
+  setTimeout(()=>{
+    qr.resume();
+    isProcessing = false;
+  },2000);
 }
 
-/* 🔊 Sound System (Guaranteed Working) */
+/* 🔊 Professional Sound */
 
-function playBeep(type){
-  const context = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = context.createOscillator();
-  const gainNode = context.createGain();
+function playSuccess(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
 
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
+  o.connect(g);
+  g.connect(ctx.destination);
 
-  if(type === "success"){
-    oscillator.frequency.value = 900;
-  } else {
-    oscillator.frequency.value = 300;
-  }
+  o.type = "triangle";
+  o.frequency.setValueAtTime(700, ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.2);
 
-  oscillator.type = "sine";
-  oscillator.start();
+  g.gain.setValueAtTime(1, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
 
-  gainNode.gain.setValueAtTime(1, context.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.5);
+  o.start();
+  o.stop(ctx.currentTime + 0.4);
+}
 
-  oscillator.stop(context.currentTime + 0.5);
+function playError(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(250, ctx.currentTime);
+
+  g.gain.setValueAtTime(1, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+
+  o.start();
+  o.stop(ctx.currentTime + 0.6);
 }
 
 </script>
