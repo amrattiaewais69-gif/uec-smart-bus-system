@@ -3,102 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>University of East Capital - Bus System</title>
+<title>University of East Capital - Executive Bus System</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
+
 body{
   margin:0;
   font-family:'Segoe UI',sans-serif;
-  background:#0a1a2f;
+  background:linear-gradient(180deg,#081424,#0a1a2f);
   color:white;
   text-align:center;
+  overflow-x:hidden;
 }
+
+/* Header */
 
 header{
   padding:20px;
-  font-size:28px;
+  font-size:30px;
   font-weight:bold;
   color:#d4af37;
-  border-bottom:3px solid #d4af37;
+  border-bottom:2px solid #d4af37;
   letter-spacing:1px;
 }
 
-.bus-icon{
-  font-size:50px;
+/* Moving Road Section */
+
+.road-container{
+  position:relative;
+  height:120px;
   margin-top:10px;
-  animation: floatBus 3s ease-in-out infinite;
+  overflow:hidden;
 }
 
-@keyframes floatBus{
-  0%{ transform:translateY(0px); }
-  50%{ transform:translateY(-8px); }
-  100%{ transform:translateY(0px); }
+.road{
+  position:absolute;
+  bottom:20px;
+  width:200%;
+  height:6px;
+  background:repeating-linear-gradient(
+    90deg,
+    #d4af37 0px,
+    #d4af37 40px,
+    transparent 40px,
+    transparent 80px
+  );
+  animation: roadMove 2s linear infinite;
 }
 
-.container{ padding:20px; }
-
-input{
-  padding:10px;
-  margin:10px;
-  border-radius:8px;
-  border:none;
-  width:220px;
-  font-size:16px;
+@keyframes roadMove{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-80px); }
 }
 
-button{
-  padding:12px 25px;
-  border:none;
-  border-radius:8px;
-  background:#d4af37;
-  color:#0a1a2f;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
+.bus{
+  position:absolute;
+  bottom:35px;
+  left:-120px;
+  font-size:60px;
+  animation: busDrive 6s linear infinite;
 }
 
-button:hover{ transform:scale(1.05); }
+@keyframes busDrive{
+  0%{ left:-120px; }
+  100%{ left:110%; }
+}
+
+/* Scanner */
 
 #reader{
-  width:300px;
+  width:320px;
   margin:20px auto;
   border:3px solid #d4af37;
-  border-radius:12px;
+  border-radius:15px;
   padding:10px;
-  box-shadow:0 0 15px rgba(212,175,55,0.6);
-  transition:0.3s;
+  box-shadow:0 0 20px rgba(212,175,55,0.5);
+  transition:0.4s;
 }
 
 #reader.approved-glow{
-  box-shadow:0 0 30px #00ff88;
+  box-shadow:0 0 35px #00ff88;
 }
 
 #reader.error-glow{
-  box-shadow:0 0 30px #ff4444;
+  box-shadow:0 0 35px #ff4444;
 }
 
-#status{
-  margin-top:20px;
-  font-size:22px;
-  font-weight:bold;
-  min-height:60px;
-}
-
-.counter{
-  margin-top:10px;
-  font-size:18px;
-  color:#d4af37;
-}
-
-footer{
-  margin-top:40px;
-  padding:15px;
-  font-size:14px;
-  border-top:2px solid #d4af37;
-  color:#ccc;
-}
+/* Overlay */
 
 #resultOverlay{
   position:fixed;
@@ -109,9 +102,9 @@ footer{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:40px;
+  flex-direction:column;
+  font-size:42px;
   font-weight:bold;
-  color:white;
   opacity:0;
   pointer-events:none;
   transition:0.4s;
@@ -122,24 +115,78 @@ footer{
 #resultOverlay.show{ opacity:1; }
 
 #resultOverlay.approved{
-  background:linear-gradient(135deg,#0f5132,#198754);
+  background:radial-gradient(circle,#0f5132,#081424);
 }
 
 #resultOverlay.rejected{
-  background:linear-gradient(135deg,#5a0f0f,#a71d2a);
+  background:radial-gradient(circle,#5a0f0f,#081424);
 }
+
+/* Gold Particle Burst */
+
+.particle{
+  position:absolute;
+  width:8px;
+  height:8px;
+  background:#d4af37;
+  border-radius:50%;
+  animation: explode 1s forwards;
+}
+
+@keyframes explode{
+  to{
+    transform:translate(var(--x),var(--y));
+    opacity:0;
+  }
+}
+
+/* Inputs */
+
+input{
+  padding:10px;
+  margin:10px;
+  border-radius:8px;
+  border:none;
+  width:220px;
+}
+
+button{
+  padding:12px 25px;
+  border:none;
+  border-radius:8px;
+  background:#d4af37;
+  color:#0a1a2f;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.counter{
+  color:#d4af37;
+  margin-top:10px;
+}
+
+footer{
+  margin-top:40px;
+  padding:15px;
+  font-size:14px;
+  border-top:2px solid #d4af37;
+  color:#ccc;
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-University of East Capital<br>
-Bus Attendance System
-<div class="bus-icon">🚌</div>
+🎓 University of East Capital<br>
+Executive Bus Access System
 </header>
 
-<div class="container">
+<div class="road-container">
+  <div class="bus">🚌</div>
+  <div class="road"></div>
+</div>
 
 <div id="loginSection">
   <h3>Driver Login</h3>
@@ -155,8 +202,6 @@ Bus Attendance System
   <div class="counter">Students Count: <span id="count">0</span></div>
 </div>
 
-</div>
-
 <footer>
 Designed by UEC ICT Department<br>
 © 2026 University of East Capital. All Rights Reserved.
@@ -166,36 +211,29 @@ Designed by UEC ICT Department<br>
 
 <script>
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbw-G-TCGtuBDT-TbOE3Lrs9toH48WHhL2NWq6wi183qlICL7Ypmt_1R21L_elNfq4rl/exec";
+const scriptURL="https://script.google.com/macros/s/AKfycbw-G-TCGtuBDT-TbOE3Lrs9toH48WHhL2NWq6wi183qlICL7Ypmt_1R21L_elNfq4rl/exec";
 
-let studentCount = 0;
+let studentCount=0;
 let qr;
-let isProcessing = false;
-let lastScannedId = null;
+let isProcessing=false;
+let lastScannedId=null;
 
 function startSystem(){
 
-  const driver = document.getElementById("driver").value;
-  const bus = document.getElementById("bus").value;
+  const driver=document.getElementById("driver").value;
+  const bus=document.getElementById("bus").value;
 
-  if(!driver || !bus){
-    alert("Enter Driver Name and Bus Number");
-    return;
-  }
+  if(!driver||!bus){ alert("Enter Driver Name & Bus Number"); return; }
 
   document.getElementById("loginSection").style.display="none";
   document.getElementById("scanSection").style.display="block";
 
-  document.getElementById("sessionInfo").innerHTML =
+  document.getElementById("sessionInfo").innerHTML=
     "Driver: "+driver+" | Bus: "+bus+"<br>"+new Date().toLocaleString();
 
-  qr = new Html5Qrcode("reader");
+  qr=new Html5Qrcode("reader");
 
-  qr.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },
-    onScanSuccess
-  );
+  qr.start({facingMode:"environment"},{fps:10,qrbox:250},onScanSuccess);
 }
 
 async function onScanSuccess(decodedText){
@@ -204,122 +242,105 @@ async function onScanSuccess(decodedText){
 
   let data;
 
-  try{
-    data = JSON.parse(decodedText);
-  }catch(e){
-    playError();
-    return;
-  }
+  try{ data=JSON.parse(decodedText); }
+  catch{ return; }
 
-  if(data.id === lastScannedId){
-    return;
-  }
+  if(data.id===lastScannedId) return;
 
-  isProcessing = true;
-  lastScannedId = data.id;
-
+  isProcessing=true;
+  lastScannedId=data.id;
   qr.pause();
 
-  const driver = document.getElementById("driver").value;
-  const bus = document.getElementById("bus").value;
+  const response=await fetch(scriptURL,{
+    method:"POST",
+    body:JSON.stringify({
+      studentId:data.id,
+      studentName:data.name,
+      college:data.college,
+      driverName:driver.value,
+      busNumber:bus.value
+    })
+  });
 
-  try{
+  const result=await response.json();
 
-    const response = await fetch(scriptURL,{
-      method:"POST",
-      body: JSON.stringify({
-        studentId: data.id,
-        studentName: data.name,
-        college: data.college,
-        driverName: driver,
-        busNumber: bus
-      })
-    });
+  document.getElementById("status").innerHTML=
+    result.status.toUpperCase()+"<br>"+result.message;
 
-    const result = await response.json();
+  showOverlay(result.status,result.message);
 
-    document.getElementById("status").innerHTML =
-      result.status.toUpperCase()+"<br>"+result.message;
-
-    showOverlay(result.status, result.message);
-
-    if(result.status === "approved"){
-      studentCount++;
-      document.getElementById("count").innerText = studentCount;
-      playSuccess();
-    }else{
-      playError();
-    }
-
-  }catch(error){
-    document.getElementById("status").innerHTML="Connection Error";
+  if(result.status==="approved"){
+    studentCount++;
+    document.getElementById("count").innerText=studentCount;
+    playSuccess();
+    goldExplosion();
+  }else{
     playError();
   }
 
-  setTimeout(()=>{
-    qr.resume();
-    isProcessing = false;
-  },2000);
+  setTimeout(()=>{ qr.resume(); isProcessing=false; },2000);
 }
 
-function showOverlay(type, message){
+/* Overlay */
 
-  const overlay = document.getElementById("resultOverlay");
+function showOverlay(type,message){
+
+  const overlay=document.getElementById("resultOverlay");
   overlay.className="";
-  overlay.classList.add("show");
-  overlay.classList.add(type);
-  overlay.innerHTML = type.toUpperCase()+"<br>"+message;
+  overlay.classList.add("show",type);
+  overlay.innerHTML=type.toUpperCase()+"<br>"+message;
 
-  if(type === "approved"){
-    document.getElementById("reader").classList.add("approved-glow");
+  if(type==="approved"){
+    reader.classList.add("approved-glow");
   }else{
-    document.getElementById("reader").classList.add("error-glow");
+    reader.classList.add("error-glow");
   }
 
   setTimeout(()=>{
     overlay.className="";
-    document.getElementById("reader").classList.remove("approved-glow","error-glow");
+    reader.classList.remove("approved-glow","error-glow");
   },1500);
 }
 
+/* Gold Explosion */
+
+function goldExplosion(){
+  for(let i=0;i<20;i++){
+    const p=document.createElement("div");
+    p.className="particle";
+    p.style.setProperty('--x',(Math.random()*400-200)+"px");
+    p.style.setProperty('--y',(Math.random()*400-200)+"px");
+    p.style.left="50%";
+    p.style.top="50%";
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1000);
+  }
+}
+
+/* Sound */
+
 function playSuccess(){
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const now = ctx.currentTime;
-
-  const o1 = ctx.createOscillator();
-  const g1 = ctx.createGain();
-
-  o1.type="sine";
-  o1.frequency.setValueAtTime(880,now);
-  o1.connect(g1);
-  g1.connect(ctx.destination);
-  g1.gain.setValueAtTime(0.0001,now);
-  g1.gain.exponentialRampToValueAtTime(0.5,now+0.05);
-  g1.gain.exponentialRampToValueAtTime(0.0001,now+0.6);
-  o1.start(now);
-  o1.stop(now+0.6);
-
-  if(navigator.vibrate){ navigator.vibrate([80]); }
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const o=ctx.createOscillator();
+  const g=ctx.createGain();
+  o.type="sine";
+  o.frequency.value=900;
+  o.connect(g); g.connect(ctx.destination);
+  g.gain.setValueAtTime(0.5,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.6);
+  o.start(); o.stop(ctx.currentTime+0.6);
 }
 
 function playError(){
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const now = ctx.currentTime;
-
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-
-  o.type="sawtooth";
-  o.frequency.setValueAtTime(200,now);
-  o.connect(g);
-  g.connect(ctx.destination);
-  g.gain.setValueAtTime(0.0001,now);
-  g.gain.exponentialRampToValueAtTime(0.4,now+0.05);
-  g.gain.exponentialRampToValueAtTime(0.0001,now+0.8);
-  o.start(now);
-  o.stop(now+0.8);
-
-  if(navigator.vibrate){ navigator.vibrate([200,100,200]); }
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const o=ctx.createOscillator();
+  const g=ctx.createGain();
+  o.type="triangle";
+  o.frequency.value=220;
+  o.connect(g); g.connect(ctx.destination);
+  g.gain.setValueAtTime(0.4,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);
+  o.start(); o.stop(ctx.currentTime+0.8);
 }
 
 </script>
