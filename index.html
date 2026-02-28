@@ -32,8 +32,6 @@ button{
 }
 </style>
 </head>
-<audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
-<audio id="errorSound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-wrong-2572.mp3"></audio>
 <body>
 
 <h1>University of East Capital</h1>
@@ -41,7 +39,7 @@ button{
 <div class="box">
 Driver Name: <input id="driver"><br><br>
 Bus Number: <input id="bus"><br><br>
-<button onclick="startScan()">Start Scan</button>
+<button onclick="startScan(); unlockAudio();">Start Scan</button>
 </div>
 
 <div id="reader" style="width:300px;margin:auto;"></div>
@@ -92,7 +90,14 @@ else{
 
   });
 }
-
+function unlockAudio(){
+  const s = document.getElementById("successSound");
+  const e = document.getElementById("errorSound");
+  s.play().then(()=>{ s.pause(); s.currentTime=0; });
+  e.play().then(()=>{ e.pause(); e.currentTime=0; });
+}
 </script>
+<audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
+<audio id="errorSound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-wrong-2572.mp3"></audio>
 </body>
 </html>
