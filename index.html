@@ -64,8 +64,7 @@ function startScan(){
     qrbox: 250
   }, async (decodedText) => {
 
-    alert(decodedText);
-return;
+    const data = JSON.parse(decodedText);
 
     const res = await fetch(scriptURL, {
       method: "POST",
