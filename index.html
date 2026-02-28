@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>University of East Capital</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+body{
+  background:#0b1c2d;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+.box{
+  border:3px solid gold;
+  padding:20px;
+  margin:20px;
+  border-radius:15px;
+}
+.status{
+  font-size:22px;
+  margin-top:15px;
+}
+.footer{
+  margin-top:50px;
+  font-size:12px;
+  color:#ccc;
+}
+button{
+  padding:10px 20px;
+  margin:10px;
+}
+</style>
+</head>
+<body>
+
+<h1>University of East Capital</h1>
+
+<div class="box">
+Driver Name: <input id="driver"><br><br>
+Bus Number: <input id="bus"><br><br>
+<button onclick="startScan()">Start Scan</button>
+</div>
+
+<div id="reader" style="width:300px;margin:auto;"></div>
+<div class="status" id="status"></div>
+
+<div class="footer">
+Designed by UEC ICT Department<br>
+© 2026 University of East Capital. All Rights Reserved.
+</div>
+
+<script>
+
+const scriptURL = "PUT_YOUR_SCRIPT_URL_HERE";
+
+function startScan(){
+  const driver = document.getElementById("driver").value;
+  const bus = document.getElementById("bus").value;
+
+  const qr = new Html5Qrcode("reader");
+  qr.start({ facingMode: "environment" }, {
+    fps: 10,
+    qrbox: 250
+  }, async (decodedText) => {
+
+    const data = JSON.parse(decodedText);
+
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({
+        studentId: data.id,
+        studentName: data.name,
+        college: data.college,
+        driverName: driver,
+        busNumber: bus
+      })
+    });
+
+    const result = await res.json();
+    document.getElementById("status").innerHTML =
+      result.status.toUpperCase() + "<br>" + result.message;
+
+  });
+}
+
+</script>
+</body>
+</html>
