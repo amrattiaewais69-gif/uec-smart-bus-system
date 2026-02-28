@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>University of East Capital - Executive Bus System</title>
+<title>Executive Bus System</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -22,57 +22,64 @@ body{
 
 header{
   padding:20px;
-  font-size:30px;
+  font-size:28px;
   font-weight:bold;
   color:#d4af37;
   border-bottom:2px solid #d4af37;
-  letter-spacing:1px;
 }
 
-/* Moving Road Section */
+/* Road Section */
 
 .road-container{
   position:relative;
-  height:120px;
-  margin-top:10px;
+  height:170px;
   overflow:hidden;
 }
 
 .road{
   position:absolute;
-  bottom:20px;
+  bottom:30px;
   width:200%;
-  height:6px;
+  height:8px;
   background:repeating-linear-gradient(
     90deg,
     #d4af37 0px,
-    #d4af37 40px,
-    transparent 40px,
-    transparent 80px
+    #d4af37 50px,
+    transparent 50px,
+    transparent 100px
   );
-  animation: roadMove 2s linear infinite;
+  animation:roadMove 2s linear infinite;
 }
 
 @keyframes roadMove{
-  from{ transform:translateX(0); }
-  to{ transform:translateX(-80px); }
+  from{transform:translateX(0);}
+  to{transform:translateX(-100px);}
 }
+
+/* Bus */
 
 .bus{
   position:absolute;
-  bottom:25px;
-  left:-300px;
-  animation: busDrive 8s linear infinite;
-}
-
-.bus img{
-  width:260px;
-  height:auto;
+  bottom:38px;
+  left:-350px;
+  animation:busDrive 10s linear infinite;
 }
 
 @keyframes busDrive{
-  0%{ left:-120px; }
-  100%{ left:110%; }
+  0%{left:-350px;}
+  100%{left:110%;}
+}
+
+/* Wheels rotation */
+
+.wheel{
+  animation:spin 1s linear infinite;
+  transform-origin:center;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
 }
 
 /* Scanner */
@@ -84,7 +91,6 @@ header{
   border-radius:15px;
   padding:10px;
   box-shadow:0 0 20px rgba(212,175,55,0.5);
-  transition:0.4s;
 }
 
 #reader.approved-glow{
@@ -107,16 +113,15 @@ header{
   align-items:center;
   justify-content:center;
   flex-direction:column;
-  font-size:42px;
+  font-size:40px;
   font-weight:bold;
   opacity:0;
   pointer-events:none;
   transition:0.4s;
   z-index:9999;
-  text-align:center;
 }
 
-#resultOverlay.show{ opacity:1; }
+#resultOverlay.show{opacity:1;}
 
 #resultOverlay.approved{
   background:radial-gradient(circle,#0f5132,#081424);
@@ -125,26 +130,6 @@ header{
 #resultOverlay.rejected{
   background:radial-gradient(circle,#5a0f0f,#081424);
 }
-
-/* Gold Particle Burst */
-
-.particle{
-  position:absolute;
-  width:8px;
-  height:8px;
-  background:#d4af37;
-  border-radius:50%;
-  animation: explode 1s forwards;
-}
-
-@keyframes explode{
-  to{
-    transform:translate(var(--x),var(--y));
-    opacity:0;
-  }
-}
-
-/* Inputs */
 
 input{
   padding:10px;
@@ -170,7 +155,7 @@ button{
 }
 
 footer{
-  margin-top:40px;
+  margin-top:30px;
   padding:15px;
   font-size:14px;
   border-top:2px solid #d4af37;
@@ -183,21 +168,45 @@ footer{
 <body>
 
 <header>
-🎓 University of East Capital<br>
-Executive Bus Access System
+University Executive Bus Access System
 </header>
 
 <div class="road-container">
+
+  <!-- SVG BUS -->
   <div class="bus">
-  <img src="bus.png" alt="University Bus">
-</div>
+    <svg width="320" height="110" viewBox="0 0 320 110">
+      
+      <!-- Shadow -->
+      <ellipse cx="160" cy="100" rx="130" ry="8" fill="rgba(0,0,0,0.4)"/>
+      
+      <!-- Body -->
+      <rect x="20" y="20" width="280" height="60" rx="15" fill="#111"/>
+      <rect x="20" y="20" width="280" height="40" rx="15" fill="#d4af37"/>
+      
+      <!-- Windows -->
+      <rect x="40" y="30" width="200" height="25" rx="5" fill="#1e2f45"/>
+      
+      <!-- Front glass -->
+      <rect x="240" y="30" width="40" height="25" rx="5" fill="#1e2f45"/>
+      
+      <!-- Wheels -->
+      <circle class="wheel" cx="80" cy="85" r="18" fill="#222"/>
+      <circle class="wheel" cx="80" cy="85" r="8" fill="#888"/>
+      
+      <circle class="wheel" cx="230" cy="85" r="18" fill="#222"/>
+      <circle class="wheel" cx="230" cy="85" r="8" fill="#888"/>
+      
+    </svg>
+  </div>
+
   <div class="road"></div>
 </div>
 
 <div id="loginSection">
   <h3>Driver Login</h3>
   <input type="text" id="driver" placeholder="Driver Name"><br>
-  <input type="text" id="bus" placeholder="Bus Number"><br>
+  <input type="text" id="busNumber" placeholder="Bus Number"><br>
   <button onclick="startSystem()">Start System</button>
 </div>
 
@@ -209,8 +218,7 @@ Executive Bus Access System
 </div>
 
 <footer>
-Designed by UEC ICT Department<br>
-© 2026 University of East Capital. All Rights Reserved.
+© 2026 University Executive Transport System
 </footer>
 
 <div id="resultOverlay"></div>
@@ -227,9 +235,12 @@ let lastScannedId=null;
 function startSystem(){
 
   const driver=document.getElementById("driver").value;
-  const bus=document.getElementById("bus").value;
+  const bus=document.getElementById("busNumber").value;
 
-  if(!driver||!bus){ alert("Enter Driver Name & Bus Number"); return; }
+  if(!driver||!bus){
+    alert("Enter Driver Name & Bus Number");
+    return;
+  }
 
   document.getElementById("loginSection").style.display="none";
   document.getElementById("scanSection").style.display="block";
@@ -238,7 +249,6 @@ function startSystem(){
     "Driver: "+driver+" | Bus: "+bus+"<br>"+new Date().toLocaleString();
 
   qr=new Html5Qrcode("reader");
-
   qr.start({facingMode:"environment"},{fps:10,qrbox:250},onScanSuccess);
 }
 
@@ -247,7 +257,6 @@ async function onScanSuccess(decodedText){
   if(isProcessing) return;
 
   let data;
-
   try{ data=JSON.parse(decodedText); }
   catch{ return; }
 
@@ -262,32 +271,24 @@ async function onScanSuccess(decodedText){
     body:JSON.stringify({
       studentId:data.id,
       studentName:data.name,
-      college:data.college,
-      driverName:driver.value,
-      busNumber:bus.value
+      college:data.college
     })
   });
 
   const result=await response.json();
-
-  document.getElementById("status").innerHTML=
-    result.status.toUpperCase()+"<br>"+result.message;
 
   showOverlay(result.status,result.message);
 
   if(result.status==="approved"){
     studentCount++;
     document.getElementById("count").innerText=studentCount;
-    playSuccess();
-    goldExplosion();
-  }else{
-    playError();
   }
 
-  setTimeout(()=>{ qr.resume(); isProcessing=false; },2000);
+  setTimeout(()=>{
+    qr.resume();
+    isProcessing=false;
+  },2000);
 }
-
-/* Overlay */
 
 function showOverlay(type,message){
 
@@ -296,57 +297,7 @@ function showOverlay(type,message){
   overlay.classList.add("show",type);
   overlay.innerHTML=type.toUpperCase()+"<br>"+message;
 
-  if(type==="approved"){
-    reader.classList.add("approved-glow");
-  }else{
-    reader.classList.add("error-glow");
-  }
-
-  setTimeout(()=>{
-    overlay.className="";
-    reader.classList.remove("approved-glow","error-glow");
-  },1500);
-}
-
-/* Gold Explosion */
-
-function goldExplosion(){
-  for(let i=0;i<20;i++){
-    const p=document.createElement("div");
-    p.className="particle";
-    p.style.setProperty('--x',(Math.random()*400-200)+"px");
-    p.style.setProperty('--y',(Math.random()*400-200)+"px");
-    p.style.left="50%";
-    p.style.top="50%";
-    document.body.appendChild(p);
-    setTimeout(()=>p.remove(),1000);
-  }
-}
-
-/* Sound */
-
-function playSuccess(){
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const o=ctx.createOscillator();
-  const g=ctx.createGain();
-  o.type="sine";
-  o.frequency.value=900;
-  o.connect(g); g.connect(ctx.destination);
-  g.gain.setValueAtTime(0.5,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.6);
-  o.start(); o.stop(ctx.currentTime+0.6);
-}
-
-function playError(){
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const o=ctx.createOscillator();
-  const g=ctx.createGain();
-  o.type="triangle";
-  o.frequency.value=220;
-  o.connect(g); g.connect(ctx.destination);
-  g.gain.setValueAtTime(0.4,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);
-  o.start(); o.stop(ctx.currentTime+0.8);
+  setTimeout(()=>overlay.className="",1500);
 }
 
 </script>
