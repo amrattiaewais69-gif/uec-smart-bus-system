@@ -308,7 +308,7 @@ async function onScanSuccess(decodedText){
   setTimeout(()=>{
     qr.resume();
     isProcessing=false;
-  },3000);
+  },2500);
 }
 
 function showOverlay(type,message,studentId){
@@ -343,7 +343,7 @@ function showOverlay(type,message,studentId){
   setTimeout(()=>{
     overlay.className="";
     reader.classList.remove("approved-glow","error-glow");
-  },3000);
+  },2500);
 }
 
 function goldExplosion(){
