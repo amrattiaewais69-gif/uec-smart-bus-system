@@ -1,103 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>University of East Capital</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>University of East Capital - Bus System</title>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
+
 <style>
 body{
-  background:#0b1c2d;
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background:#0a1a2f;
   color:white;
-  font-family:Arial;
   text-align:center;
 }
-.box{
-  border:3px solid gold;
+
+header{
   padding:20px;
-  margin:20px;
-  border-radius:15px;
+  font-size:28px;
+  font-weight:bold;
+  color:#d4af37;
+  border-bottom:3px solid #d4af37;
 }
-.status{
-  font-size:22px;
-  margin-top:15px;
+
+.container{
+  padding:20px;
 }
-.footer{
-  margin-top:50px;
-  font-size:12px;
-  color:#ccc;
-}
-button{
-  padding:10px 20px;
+
+input, select{
+  padding:10px;
   margin:10px;
+  border-radius:8px;
+  border:none;
+  width:220px;
+  font-size:16px;
+}
+
+button{
+  padding:12px 25px;
+  border:none;
+  border-radius:8px;
+  background:#d4af37;
+  color:#0a1a2f;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+#reader{
+  width:300px;
+  margin:20px auto;
+}
+
+#status{
+  margin-top:20px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.counter{
+  margin-top:10px;
+  font-size:18px;
+  color:#d4af37;
+}
+
+footer{
+  margin-top:40px;
+  padding:15px;
+  font-size:14px;
+  border-top:2px solid #d4af37;
+  color:#ccc;
 }
 </style>
 </head>
+
 <body>
 
-<h1>University of East Capital2</h1>
+<header>
+University of East Capital<br>
+Bus Attendance System
+</header>
 
-<div class="box">
-Driver Name: <input id="driver"><br><br>
-Bus Number: <input id="bus"><br><br>
-<button onclick="startScan(); unlockAudio();">Start Scan</button>
+<div class="container">
+
+<div id="loginSection">
+  <h3>Driver Login</h3>
+  <input type="text" id="driver" placeholder="Driver Name" required><br>
+  <input type="text" id="bus" placeholder="Bus Number" required><br>
+  <button onclick="startSystem()">Start System</button>
 </div>
 
-<div id="reader" style="width:300px;margin:auto;"></div>
-<div class="status" id="status"></div>
+<div id="scanSection" style="display:none;">
+  <h3 id="sessionInfo"></h3>
+  <div id="reader"></div>
+  <div id="status"></div>
+  <div class="counter">Students Count: <span id="count">0</span></div>
+</div>
 
-<div class="footer">
+</div>
+
+<footer>
 Designed by UEC ICT Department<br>
 © 2026 University of East Capital. All Rights Reserved.
-</div>
+</footer>
 
 <script>
 
 const scriptURL = "https://script.google.com/macros/s/AKfycbw-G-TCGtuBDT-TbOE3Lrs9toH48WHhL2NWq6wi183qlICL7Ypmt_1R21L_elNfq4rl/exec";
 
-function startScan(){
+let studentCount = 0;
+let qr;
+
+function startSystem(){
   const driver = document.getElementById("driver").value;
   const bus = document.getElementById("bus").value;
 
-  const qr = new Html5Qrcode("reader");
-  qr.start({ facingMode: "environment" }, {
-    fps: 10,
-    qrbox: 250
-  }, async (decodedText) => {
+  if(!driver || !bus){
+    alert("Enter Driver Name and Bus Number");
+    return;
+  }
 
-    const data = JSON.parse(decodedText);
+  document.getElementById("loginSection").style.display="none";
+  document.getElementById("scanSection").style.display="block";
+  document.getElementById("sessionInfo").innerHTML =
+    "Driver: "+driver+" | Bus: "+bus+"<br>"+new Date().toLocaleString();
 
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify({
-        studentId: data.id,
-        studentName: data.name,
-        college: data.college,
-        driverName: driver,
-        busNumber: bus
-      })
-    });
+  qr = new Html5Qrcode("reader");
 
-    const result = await res.json();
-    document.getElementById("status").innerHTML =
-  result.status.toUpperCase() + "<br>" + result.message;
-
-if(result.status === "approved"){
-  document.getElementById("successSound").play();
-}
-else{
-  document.getElementById("errorSound").play();
+  qr.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    onScanSuccess
+  );
 }
 
+async function onScanSuccess(decodedText){
+
+  const driver = document.getElementById("driver").value;
+  const bus = document.getElementById("bus").value;
+
+  let data;
+
+  try{
+    data = JSON.parse(decodedText);
+  }catch(e){
+    document.getElementById("status").innerHTML="Invalid QR Format";
+    playBeep("error");
+    return;
+  }
+
+  const response = await fetch(scriptURL,{
+    method:"POST",
+    body: JSON.stringify({
+      studentId: data.id,
+      studentName: data.name,
+      college: data.college,
+      driverName: driver,
+      busNumber: bus
+    })
   });
+
+  const result = await response.json();
+
+  document.getElementById("status").innerHTML =
+    result.status.toUpperCase()+"<br>"+result.message;
+
+  if(result.status === "approved"){
+    studentCount++;
+    document.getElementById("count").innerText = studentCount;
+    playBeep("success");
+  }else{
+    playBeep("error");
+  }
 }
-function unlockAudio(){
-  const s = document.getElementById("successSound");
-  const e = document.getElementById("errorSound");
-  s.play().then(()=>{ s.pause(); s.currentTime=0; });
-  e.play().then(()=>{ e.pause(); e.currentTime=0; });
+
+/* 🔊 Sound System (Guaranteed Working) */
+
+function playBeep(type){
+  const context = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = context.createOscillator();
+  const gainNode = context.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(context.destination);
+
+  if(type === "success"){
+    oscillator.frequency.value = 900;
+  } else {
+    oscillator.frequency.value = 300;
+  }
+
+  oscillator.type = "sine";
+  oscillator.start();
+
+  gainNode.gain.setValueAtTime(1, context.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.5);
+
+  oscillator.stop(context.currentTime + 0.5);
 }
+
 </script>
-<audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
-<audio id="errorSound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-wrong-2572.mp3"></audio>
+
 </body>
 </html>
