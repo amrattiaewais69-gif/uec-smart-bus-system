@@ -10,7 +10,7 @@
 <style>
 body{
   margin:0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family:'Segoe UI',sans-serif;
   background:#0a1a2f;
   color:white;
   text-align:center;
@@ -22,11 +22,10 @@ header{
   font-weight:bold;
   color:#d4af37;
   border-bottom:3px solid #d4af37;
+  letter-spacing:1px;
 }
 
-.container{
-  padding:20px;
-}
+.container{ padding:20px; }
 
 input{
   padding:10px;
@@ -48,20 +47,21 @@ button{
   transition:0.3s;
 }
 
-button:hover{
-  transform:scale(1.05);
-}
+button:hover{ transform:scale(1.05); }
 
 #reader{
   width:300px;
   margin:20px auto;
+  border:3px solid #d4af37;
+  border-radius:12px;
+  padding:10px;
 }
 
 #status{
   margin-top:20px;
-  font-size:20px;
+  font-size:22px;
   font-weight:bold;
-  min-height:50px;
+  min-height:60px;
 }
 
 .counter{
@@ -83,7 +83,7 @@ footer{
 <body>
 
 <header>
-University of East Capital2<br>
+University of East Capital<br>
 Bus Attendance System
 </header>
 
@@ -206,43 +206,74 @@ async function onScanSuccess(decodedText){
   },2000);
 }
 
-/* 🔊 Professional Sound */
+/* 👑 Imperial University Sound */
 
 function playSuccess(){
+
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
+  const now = ctx.currentTime;
 
-  o.connect(g);
-  g.connect(ctx.destination);
+  const o1 = ctx.createOscillator();
+  const g1 = ctx.createGain();
 
-  o.type = "triangle";
-  o.frequency.setValueAtTime(700, ctx.currentTime);
-  o.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.2);
+  o1.type = "sine";
+  o1.frequency.setValueAtTime(880, now);
 
-  g.gain.setValueAtTime(1, ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+  o1.connect(g1);
+  g1.connect(ctx.destination);
 
-  o.start();
-  o.stop(ctx.currentTime + 0.4);
+  g1.gain.setValueAtTime(0.0001, now);
+  g1.gain.exponentialRampToValueAtTime(0.5, now + 0.05);
+  g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+
+  o1.start(now);
+  o1.stop(now + 0.6);
+
+  const o2 = ctx.createOscillator();
+  const g2 = ctx.createGain();
+
+  o2.type = "triangle";
+  o2.frequency.setValueAtTime(1320, now + 0.1);
+
+  o2.connect(g2);
+  g2.connect(ctx.destination);
+
+  g2.gain.setValueAtTime(0.0001, now + 0.1);
+  g2.gain.exponentialRampToValueAtTime(0.3, now + 0.15);
+  g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+
+  o2.start(now + 0.1);
+  o2.stop(now + 0.7);
+
+  if(navigator.vibrate){
+    navigator.vibrate([80]);
+  }
 }
 
 function playError(){
+
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const now = ctx.currentTime;
+
   const o = ctx.createOscillator();
   const g = ctx.createGain();
+
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(200, now);
 
   o.connect(g);
   g.connect(ctx.destination);
 
-  o.type = "sawtooth";
-  o.frequency.setValueAtTime(250, ctx.currentTime);
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(0.4, now + 0.05);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
 
-  g.gain.setValueAtTime(1, ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+  o.start(now);
+  o.stop(now + 0.8);
 
-  o.start();
-  o.stop(ctx.currentTime + 0.6);
+  if(navigator.vibrate){
+    navigator.vibrate([200,100,200]);
+  }
 }
 
 </script>
