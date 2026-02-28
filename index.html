@@ -17,9 +17,7 @@
   --danger:#ff4444;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 body{
   margin:0;
@@ -30,8 +28,6 @@ body{
   overflow-x:hidden;
 }
 
-/* Header */
-
 header{
   padding:20px;
   font-size:clamp(20px,4vw,32px);
@@ -40,8 +36,6 @@ header{
   border-bottom:2px solid var(--gold);
   letter-spacing:1px;
 }
-
-/* Road Section */
 
 .road-container{
   position:relative;
@@ -83,8 +77,6 @@ header{
   100%{ left:110%; }
 }
 
-/* Card Style */
-
 .card{
   background:rgba(255,255,255,0.05);
   backdrop-filter:blur(10px);
@@ -97,8 +89,6 @@ header{
   box-shadow:0 0 25px rgba(212,175,55,0.2);
 }
 
-/* Scanner */
-
 #reader{
   width:100%;
   max-width:380px;
@@ -110,15 +100,8 @@ header{
   transition:0.4s;
 }
 
-#reader.approved-glow{
-  box-shadow:0 0 35px var(--success);
-}
-
-#reader.error-glow{
-  box-shadow:0 0 35px var(--danger);
-}
-
-/* Overlay */
+#reader.approved-glow{ box-shadow:0 0 35px var(--success); }
+#reader.error-glow{ box-shadow:0 0 35px var(--danger); }
 
 #resultOverlay{
   position:fixed;
@@ -150,8 +133,6 @@ header{
   background:radial-gradient(circle,#5a0f0f,var(--dark));
 }
 
-/* Inputs */
-
 input{
   padding:14px;
   margin:10px 0;
@@ -174,19 +155,13 @@ button{
   transition:0.3s;
 }
 
-button:hover{
-  transform:scale(1.05);
-}
-
-/* Counter */
+button:hover{ transform:scale(1.05); }
 
 .counter{
   color:var(--gold);
   margin-top:10px;
   font-size:18px;
 }
-
-/* Footer */
 
 footer{
   margin-top:40px;
@@ -195,8 +170,6 @@ footer{
   border-top:2px solid var(--gold);
   color:#ccc;
 }
-
-/* Gold Explosion */
 
 .particle{
   position:absolute;
@@ -212,20 +185,6 @@ footer{
     transform:translate(var(--x),var(--y));
     opacity:0;
   }
-}
-
-/* Mobile Tweaks */
-
-@media(max-width:600px){
-
-  .road-container{
-    height:110px;
-  }
-
-  .bus{
-    animation:busDrive 10s linear infinite;
-  }
-
 }
 
 </style>
@@ -267,6 +226,7 @@ Designed by UEC ICT Department<br>
 <script>
 
 const scriptURL="https://script.google.com/macros/s/AKfycbw-G-TCGtuBDT-TbOE3Lrs9toH48WHhL2NWq6wi183qlICL7Ypmt_1R21L_elNfq4rl/exec";
+const imageBaseURL="https://raw.githubusercontent.com/amrattiaewais69-gif/uec-smart-bus-system/main/images/";
 
 let studentCount=0;
 let qr;
@@ -320,10 +280,7 @@ async function onScanSuccess(decodedText){
 
   const result=await response.json();
 
-  document.getElementById("status").innerHTML=
-    result.status.toUpperCase()+"<br>"+result.message;
-
-  showOverlay(result.status,result.message);
+  showOverlay(result.status,result.message,data.id);
 
   if(result.status==="approved"){
     studentCount++;
@@ -340,16 +297,28 @@ async function onScanSuccess(decodedText){
   },900);
 }
 
-/* Overlay */
-
-function showOverlay(type,message){
+function showOverlay(type,message,studentId){
 
   const overlay=document.getElementById("resultOverlay");
   const reader=document.getElementById("reader");
 
   overlay.className="";
   overlay.classList.add("show",type);
-  overlay.innerHTML=type.toUpperCase()+"<br>"+message;
+
+  overlay.innerHTML=`
+    <img src="${imageBaseURL}${studentId}.jpg"
+         onerror="this.src='${imageBaseURL}default-avatar.png'"
+         style="
+            width:130px;
+            height:130px;
+            border-radius:50%;
+            object-fit:cover;
+            border:4px solid ${type==="approved" ? '#00ff88' : '#ff4444'};
+            margin-bottom:15px;
+         ">
+    <div>${type.toUpperCase()}</div>
+    <div style="font-size:20px;margin-top:8px;">${message}</div>
+  `;
 
   if(type==="approved"){
     reader.classList.add("approved-glow");
@@ -363,8 +332,6 @@ function showOverlay(type,message){
   },1500);
 }
 
-/* Gold Explosion */
-
 function goldExplosion(){
   for(let i=0;i<20;i++){
     const p=document.createElement("div");
@@ -377,8 +344,6 @@ function goldExplosion(){
     setTimeout(()=>p.remove(),1000);
   }
 }
-
-/* Sound */
 
 function playSuccess(){
   const ctx=new (window.AudioContext||window.webkitAudioContext)();
