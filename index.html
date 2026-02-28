@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 <title>University of East Capital - Executive Bus System</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -250,7 +253,18 @@ function startSystem(){
     "Driver: "+driver+" | Bus: "+bus+"<br>"+new Date().toLocaleString();
 
   qr=new Html5Qrcode("reader");
-  qr.start({facingMode:"environment"},{fps:10,qrbox:250},onScanSuccess);
+
+  qr.start(
+    { facingMode: { exact: "environment" } },
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    onScanSuccess
+  ).catch(() => {
+    qr.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      onScanSuccess
+    );
+  });
 }
 
 async function onScanSuccess(decodedText){
@@ -294,7 +308,7 @@ async function onScanSuccess(decodedText){
   setTimeout(()=>{
     qr.resume();
     isProcessing=false;
-  },2500);
+  },3000);
 }
 
 function showOverlay(type,message,studentId){
@@ -329,7 +343,7 @@ function showOverlay(type,message,studentId){
   setTimeout(()=>{
     overlay.className="";
     reader.classList.remove("approved-glow","error-glow");
-  },2500);
+  },3000);
 }
 
 function goldExplosion(){
