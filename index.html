@@ -215,7 +215,6 @@ Executive Bus Access System
 <div id="scanSection" style="display:none;">
   <h3 id="sessionInfo"></h3>
   <div id="reader"></div>
-  <div id="status"></div>
   <div class="counter">Students Count: <span id="count">0</span></div>
 </div>
 
@@ -294,7 +293,7 @@ async function onScanSuccess(decodedText){
 
   const result=await response.json();
 
-  showOverlay(result.status,result.message,data.id);
+  showOverlay(result.status,result.message,data.id,data.name);
 
   if(result.status==="approved"){
     studentCount++;
@@ -311,7 +310,7 @@ async function onScanSuccess(decodedText){
   },2500);
 }
 
-function showOverlay(type,message,studentId){
+function showOverlay(type,message,studentId,studentName){
 
   const overlay=document.getElementById("resultOverlay");
   const reader=document.getElementById("reader");
@@ -330,8 +329,16 @@ function showOverlay(type,message,studentId){
             border:4px solid ${type==="approved" ? '#00ff88' : '#ff4444'};
             margin-bottom:15px;
          ">
+
+    <div style="font-size:24px;margin-bottom:10px;color:#d4af37;">
+      ${studentName}
+    </div>
+
     <div>${type.toUpperCase()}</div>
-    <div style="font-size:20px;margin-top:8px;">${message}</div>
+
+    <div style="font-size:20px;margin-top:8px;">
+      ${message}
+    </div>
   `;
 
   if(type==="approved"){
@@ -381,10 +388,10 @@ function playError(){
   o.frequency.value=220;
   o.connect(g);
   g.connect(ctx.destination);
-  g.gain.setValueAtTime(0.4,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);
+  g.gain.setValueAtTime(0.5,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.6);
   o.start();
-  o.stop(ctx.currentTime+0.8);
+  o.stop(ctx.currentTime+0.6);
 }
 
 </script>
